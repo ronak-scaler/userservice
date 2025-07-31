@@ -8,8 +8,10 @@ import java.util.Date;
 @Entity
 @Data
 public class Token extends BaseModel {
+
     private Date expiry;
     private boolean active;
+
     private String value;
 
     @ManyToOne

@@ -11,17 +11,23 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/users")
 public class UserController {
-
     private UserService userService;
 
-    UserController(UserService userService){
+    UserController(UserService userService) {
         this.userService = userService;
     }
+
     @PostMapping("/signup")
-    public UserDto signUp(@RequestBody SignUpRequest request){
-        User u =  userService.signUp(request.getEmail(), request.getPassword(), request.getName());
-        return UserDto.from(u);
+    public UserDto signUp(@RequestBody SignUpRequest requestDto) {
+        User user = userService.signUp(
+                requestDto.getEmail(),
+                requestDto.getName(),
+                requestDto.getPassword()
+        );
+
+        return UserDto.from(user);
     }
+
     @PostMapping("/login")
     public LoginDto login(@RequestBody LoginRequestDto requestDto) {
         Token token = userService.login(

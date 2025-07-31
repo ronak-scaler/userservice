@@ -15,27 +15,35 @@ import org.apache.commons.lang3.RandomStringUtils;
 
 @Service
 public class UserService {
-    private BCryptPasswordEncoder bcryptPasswordEncoder;
-    private UserRepo userRepo;
+
+    private BCryptPasswordEncoder bCryptPasswordEncoder;
+    private UserRepo userRepository;
     private TokenRepository tokenRepository;
 
-    UserService(BCryptPasswordEncoder bcryptPasswordEncoder, UserRepo userRepo, TokenRepository tokenRepository ){
-        this.bcryptPasswordEncoder = bcryptPasswordEncoder;
-        this.userRepo = userRepo;
+    UserService(BCryptPasswordEncoder bCryptPasswordEncoder,
+                UserRepo userRepository,
+                TokenRepository tokenRepository) {
+        this.bCryptPasswordEncoder = bCryptPasswordEncoder;
+        this.userRepository = userRepository;
         this.tokenRepository = tokenRepository;
     }
-    public User signUp(String email, String password, String name){
-      User user = new User();
-      user.setEmail(email);
-      user.setVerified(false);
-      user.setName(name);
-      user.setHashedPassword(bcryptPasswordEncoder.encode(password));
-      return userRepo.save(user);
 
+    public User signUp(String email,
+                       String name,
+                       String password) {
+
+        User user = new User();
+        user.setEmail(email);
+        user.setName(name);
+        user.setHashedPassword(bCryptPasswordEncoder.encode(password));
+        user.setVerified(true);
+
+        //save the user object to the DB.
+        return userRepository.save(user);
     }
 
     public Token login(String email, String password) {
-        Optional<User> optionalUser = userRepo.findByEmail(email);
+        Optional<User> optionalUser = userRepository.findByEmail(email);
 
         if (optionalUser.isEmpty()) {
             throw new RuntimeException("User with email " + email + " doesn't exist");
@@ -43,7 +51,7 @@ public class UserService {
 
         User user = optionalUser.get();
 
-        if (!bcryptPasswordEncoder.matches(password, user.getHashedPassword())) {
+        if (!bCryptPasswordEncoder.matches(password, user.getHashedPassword())) {
             //Throw some exception.
             return null;
         }
